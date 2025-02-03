@@ -60,7 +60,7 @@ App = {
       return electionInstance.candidatesCount();
     }).then(async function (candidatesCount) {
       var candidatesContainer = $("#candidatesContainer");
-      candidatesContainer.empty(); // ✅ Clear previous candidates before appending
+      candidatesContainer.empty(); // Clear previous candidates before appending
 
       for (var i = 1; i <= candidatesCount; i++) {
         let candidate = await electionInstance.candidates(i);
@@ -102,6 +102,45 @@ App = {
     }).catch(function (err) {
       console.error(err);
     });
+  },
+
+  // Fetch and display results
+  fetchResults: async function () {
+    try {
+      const accounts = await web3.eth.getAccounts();
+      const electionInstance = await App.contracts.Election.deployed();
+      const candidatesCount = await electionInstance.candidatesCount();
+
+      // Hide loader and show content
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+
+      // Fetch and display candidate results
+      const candidatesContainer = document.getElementById('candidatesContainer');
+      candidatesContainer.innerHTML = '';  // Clear previous candidates
+
+      for (let i = 1; i <= candidatesCount; i++) {
+        let candidate = await electionInstance.candidates(i);
+        let id = candidate[0].toNumber();
+        let name = candidate[1];
+        let voteCount = candidate[2].toNumber();
+
+        const candidateCard = `
+          <div class="col-md-4 mb-3">
+              <div class="candidate-card">
+                  <h5>${name}</h5>
+                  <p>Votes: <strong>${voteCount}</strong></p>
+              </div>
+          </div>
+        `;
+        candidatesContainer.insertAdjacentHTML('beforeend', candidateCard);
+      }
+
+      document.getElementById('accountAddress').innerText = `Connected Account: ${accounts[0]}`;
+    } catch (error) {
+      console.error(error);
+      alert('Error fetching results.');
+    }
   }
 };
 
@@ -110,7 +149,7 @@ $(function () {
     App.init();
   });
 
-  // ✅ Event delegation for dynamically added elements
+  // Event delegation for dynamically added elements
   $(document).on("click", ".vote-btn", function () {
     let candidateId = $(this).data("id");
     App.castVote(candidateId);

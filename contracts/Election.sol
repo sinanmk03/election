@@ -23,9 +23,8 @@ contract Election {
 
     // Constructor (correctly named)
     constructor() public {
-        addCandidate("Swalih");
-        addCandidate("Minhaj");
-        addCandidate("fahiz");
+        addCandidate("Candidate1");
+        addCandidate("Candidate2");
     }
 
     // Add a new candidate
