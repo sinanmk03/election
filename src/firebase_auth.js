@@ -158,7 +158,7 @@ if (loginForm) {
           regMsg.textContent = "Login successful! Welcome " + userData.voterName;
           regMsg.style.backgroundColor = "green";
           setTimeout(() => {
-            window.location.href = "index.html"; // Redirect to index.html after login
+            window.location.href = "voting_page.html"; // Redirect to index.html after login
           }, 2000);
         } else {
           regMsg.textContent = "Incorrect password. Please try again.";

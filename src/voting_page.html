@@ -28,31 +28,19 @@
         .candidate-card:hover {
             transform: scale(1.05);
         }
-
-        #loader {
-            text-align: center;
-        }
-
-        .result-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 <body>
   <header class="text-white p-3" style="background-color: #0a3981">
-    <h1>Election Results</h1>
+    <h1>Vote Now.</h1>
   </header>
-
-  <div class="container mt-4">
+    <div class="container mt-4">
         <h1 class="text-center">Election Results</h1>
         <hr/>
         <div id="loader">
             <p class="text-center">Loading...</p>
         </div>
         <div id="content" style="display: none;">
-            <div class="result-title text-center">Voting Results</div>
             <div class="row" id="candidatesContainer">
                 <!-- Candidate cards will be dynamically inserted here -->
             </div>
@@ -60,21 +48,11 @@
             <p id="accountAddress" class="text-center mt-4"></p>
         </div>
     </div>
-
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
     <script src="web3.min.js"></script>
     <script src="truffle-contract.js"></script>
     <script src="app.js"></script>
-
-    <script>
-        window.addEventListener('load', () => {
-            if (typeof window.ethereum !== 'undefined') {
-                App.fetchResults();
-            } else {
-                alert('Please install MetaMask!');
-            }
-        });
-    </script>
 </body>
 </html>
