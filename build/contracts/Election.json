@@ -109,7 +109,7 @@
   "sourceMap": "27:1454:0:-;;;553:127;8:9:-1;5:2;;;30:1;27;20:12;5:2;553:127:0;585:22;;;;;;;;;;;;;;;;;;:12;;;:22;;:::i;:::-;618;;;;;;;;;;;;;;;;;;:12;;;:22;;:::i;:::-;651:21;;;;;;;;;;;;;;;;;;:12;;;:21;;:::i;:::-;27:1454;;716:164;778:15;;:17;;;;;;;;;;;;;836:36;;;;;;;;846:15;;836:36;;;;863:5;836:36;;;;870:1;836:36;;;806:10;:27;817:15;;806:27;;;;;;;;;;;:66;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;716:164;:::o;27:1454::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;",
   "deployedSourceMap": "27:1454:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;27:1454:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;917:561;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;917:561:0;;;;;;;;;;;;;;;;;:::i;:::-;;391:27;;;:::i;:::-;;;;;;;;;;;;;;;;;;;309:44;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;309:44:0;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;309:44:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;215:38;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;215:38:0;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;917:561;1027:6;:18;1034:10;1027:18;;;;;;;;;;;;;;;;;;;;;;;;;1026:19;1018:55;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1151:1;1136:12;:16;:51;;;;;1172:15;;1156:12;:31;;1136:51;1128:85;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1290:4;1269:6;:18;1276:10;1269:18;;;;;;;;;;;;;;;;:25;;;;;;;;;;;;;;;;;;1356:10;:24;1367:12;1356:24;;;;;;;;;;;:34;;;:36;;;;;;;;;;;;;1457:12;1446:24;;;;;;;;;;917:561;:::o;391:27::-;;;;:::o;309:44::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;215:38::-;;;;;;;;;;;;;;;;;;;;;;:::o",
   "source": "pragma solidity ^0.5.0;\r\n\r\ncontract Election {\r\n    // Model a Candidate\r\n    struct Candidate {\r\n        uint id;\r\n        string name;\r\n        uint voteCount;\r\n    }\r\n\r\n    // Store accounts that have voted\r\n    mapping(address => bool) public voters;\r\n    // Store Candidates\r\n    // Fetch Candidate\r\n    mapping(uint => Candidate) public candidates;\r\n    // Store Candidates Count\r\n    uint public candidatesCount;\r\n\r\n    // Voted event\r\n    event votedEvent(\r\n        uint indexed _candidateId\r\n    );\r\n\r\n    // Constructor (correctly named)\r\n    constructor() public {\r\n        addCandidate(\"Swalih\");\r\n        addCandidate(\"Minhaj\");\r\n        addCandidate(\"fahiz\");\r\n    }\r\n\r\n    // Add a new candidate\r\n    function addCandidate(string memory _name) private {\r\n        candidatesCount++;\r\n        candidates[candidatesCount] = Candidate(candidatesCount, _name, 0);\r\n    }\r\n\r\n    // Vote for a candidate\r\n    function vote(uint _candidateId) public {\r\n        // Ensure the sender hasn't voted before\r\n        require(!voters[msg.sender], \"You have already voted!\");\r\n\r\n        // Ensure the candidate is valid\r\n        require(_candidateId > 0 && _candidateId <= candidatesCount, \"Invalid candidate ID!\");\r\n\r\n        // Mark that the sender has voted\r\n        voters[msg.sender] = true;\r\n\r\n        // Increment the candidate's vote count\r\n        candidates[_candidateId].voteCount++;\r\n\r\n        // Trigger the voted event\r\n        emit votedEvent(_candidateId);\r\n    }\r\n}\r\n",
-  "sourcePath": "C:\\Users\\sinan\\Desktop\\team\\election\\contracts\\Election.sol",
+  "sourcePath": "C:\\Users\\swali\\Desktop\\election\\contracts\\Election.sol",
   "ast": {
     "absolutePath": "project:/contracts/Election.sol",
     "exportedSymbols": {
@@ -2924,12 +2924,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xBC82D5106bBa14F8A009271904AB428850f11F13",
-      "transactionHash": "0xfd737005ae9c80bd80741e9f6e22ccbc8fc89c38e5545c7b519f14d563402eae"
+      "address": "0xD7e9027e6De03dcB2BBEe6a99b080b5402348476",
+      "transactionHash": "0x2a7c978f2e7b9da894f130fea8f3c9936b36ca348f12816300487bd9a517f214"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-02-03T14:01:12.490Z",
+  "updatedAt": "2025-02-04T03:41:30.876Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}
