@@ -5,6 +5,12 @@ App = {
   hasVoted: false,
 
   init: function () {
+    const currentPage = window.location.pathname.split("/").pop();
+    if (currentPage === "index.html" && !sessionStorage.getItem("loggedIn")) {
+      window.location.href = "voting_page.html";
+      return;
+    }
+
     return App.initWeb3();
   },
 
@@ -16,6 +22,7 @@ App = {
       App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
       web3 = new Web3(App.web3Provider);
     }
+
     return App.initContract();
   },
 
@@ -35,7 +42,7 @@ App = {
         fromBlock: 'latest'
       }).watch(function (error, event) {
         console.log("Event triggered", event);
-        App.render(); // Re-render when a vote is cast
+        App.render();
       });
     });
   },
@@ -60,7 +67,7 @@ App = {
       return electionInstance.candidatesCount();
     }).then(async function (candidatesCount) {
       var candidatesContainer = $("#candidatesContainer");
-      candidatesContainer.empty(); // ✅ Clear previous candidates before appending
+      candidatesContainer.empty(); 
 
       for (var i = 1; i <= candidatesCount; i++) {
         let candidate = await electionInstance.candidates(i);
@@ -102,15 +109,59 @@ App = {
     }).catch(function (err) {
       console.error(err);
     });
+  },
+
+  fetchResults: async function () {
+    try {
+      const accounts = await web3.eth.getAccounts();
+      const electionInstance = await App.contracts.Election.deployed();
+      const candidatesCount = await electionInstance.candidatesCount();
+
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+
+      const candidatesContainer = document.getElementById('candidatesContainer');
+      candidatesContainer.innerHTML = ''; 
+
+      for (let i = 1; i <= candidatesCount; i++) {
+        let candidate = await electionInstance.candidates(i);
+        let id = candidate[0].toNumber();
+        let name = candidate[1];
+        let voteCount = candidate[2].toNumber();
+
+        const candidateCard = `
+          <div class="col-md-4 mb-3">
+              <div class="candidate-card">
+                  <h5>${name}</h5>
+                  <p>Votes: <strong>${voteCount}</strong></p>
+              </div>
+          </div>
+        `;
+        candidatesContainer.insertAdjacentHTML('beforeend', candidateCard);
+      }
+
+      document.getElementById('accountAddress').innerText = `Connected Account: ${accounts[0]}`;
+    } catch (error) {
+      console.error(error);
+      alert('Error fetching results.');
+    }
   }
 };
 
 $(function () {
+  const currentPage = window.location.pathname.split("/").pop();
+
+  if (currentPage === "index.html") {
+    $("#loginBtn").click(function () {
+      sessionStorage.setItem("loggedIn", "true");
+      window.location.href = "voting_page.html";
+    });
+  }
+
   $(window).load(function () {
     App.init();
   });
 
-  // ✅ Event delegation for dynamically added elements
   $(document).on("click", ".vote-btn", function () {
     let candidateId = $(this).data("id");
     App.castVote(candidateId);
