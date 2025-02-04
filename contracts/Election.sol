@@ -17,9 +17,7 @@ contract Election {
     uint public candidatesCount;
 
     // Voted event
-    event votedEvent(
-        uint indexed _candidateId
-    );
+    event votedEvent(uint indexed _candidateId);
 
     // Constructor (correctly named)
     constructor() public {
@@ -39,7 +37,10 @@ contract Election {
         require(!voters[msg.sender], "You have already voted!");
 
         // Ensure the candidate is valid
-        require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate ID!");
+        require(
+            _candidateId > 0 && _candidateId <= candidatesCount,
+            "Invalid candidate ID!"
+        );
 
         // Mark that the sender has voted
         voters[msg.sender] = true;

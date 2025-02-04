@@ -146,7 +146,10 @@ if (loginForm) {
 
     showLoading();
     try {
-      const q = query(collection(db, "voters"), where("voterID", "==", voterID));
+      const q = query(
+        collection(db, "voters"),
+        where("voterID", "==", voterID)
+      );
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
@@ -155,7 +158,8 @@ if (loginForm) {
 
         if (userData.password === password) {
           console.log("User logged in:", userDoc.id);
-          regMsg.textContent = "Login successful! Welcome " + userData.voterName;
+          regMsg.textContent =
+            "Login successful! Welcome " + userData.voterName;
           regMsg.style.backgroundColor = "green";
           setTimeout(() => {
             window.location.href = "voting_page.html"; // Redirect to index.html after login
