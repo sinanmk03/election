@@ -1455,12 +1455,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x0f807aE30641421Cc1433d45a069ff4186976E0D",
-      "transactionHash": "0x2283e489fd0321c60254994a40410d9c3f5241d40f9c8e228e2f8a2ca98ba5f4"
+      "address": "0x570B77b16557a08b47b5Dd8dE27625a96F0B0ecA",
+      "transactionHash": "0x4868c4716a5d4b42778b5c3c7e8908b0c9e4f8cc7c1ab050fc5512b6ddff2de3"
     }
   },
   "schemaVersion": "3.0.1",
-  "updatedAt": "2025-02-04T07:28:04.846Z",
+  "updatedAt": "2025-02-08T06:30:42.117Z",
   "devdoc": {
     "methods": {}
   },
