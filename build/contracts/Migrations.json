@@ -13,8 +13,7 @@
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function",
-      "signature": "0x445df0ac"
+      "type": "function"
     },
     {
       "constant": true,
@@ -28,15 +27,13 @@
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function",
-      "signature": "0x8da5cb5b"
+      "type": "function"
     },
     {
       "inputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "constructor",
-      "signature": "constructor"
+      "type": "constructor"
     },
     {
       "constant": false,
@@ -50,8 +47,7 @@
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0xfdacd576"
+      "type": "function"
     },
     {
       "constant": false,
@@ -65,8 +61,7 @@
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0x0900f010"
+      "type": "function"
     }
   ],
   "bytecode": "0x608060405234801561001057600080fd5b50336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555061032c806100606000396000f3fe608060405260043610610062576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680630900f01014610067578063445df0ac146100b85780638da5cb5b146100e3578063fdacd5761461013a575b600080fd5b34801561007357600080fd5b506100b66004803603602081101561008a57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610175565b005b3480156100c457600080fd5b506100cd6102cb565b6040518082815260200191505060405180910390f35b3480156100ef57600080fd5b506100f86102d1565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34801561014657600080fd5b506101736004803603602081101561015d57600080fd5b81019080803590602001909291905050506102f6565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16141515610239576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601a8152602001807f416363657373207265737472696374656420746f206f776e657200000000000081525060200191505060405180910390fd5b60008190508073ffffffffffffffffffffffffffffffffffffffff1663fdacd5766001546040518263ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040180828152602001915050600060405180830381600087803b1580156102af57600080fd5b505af11580156102c3573d6000803e3d6000fd5b505050505050565b60015481565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b806001819055505056fea165627a7a723058200855c634a070fa3e74c2d9195bf3f5377dce30c110413cfab0360be976495e7a0029",
@@ -1455,12 +1450,13 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x570B77b16557a08b47b5Dd8dE27625a96F0B0ecA",
-      "transactionHash": "0x4868c4716a5d4b42778b5c3c7e8908b0c9e4f8cc7c1ab050fc5512b6ddff2de3"
+      "address": "0x255A68EA0B53fC981eDE26163BAA1c1a44077258",
+      "transactionHash": "0xd07e4074e03311d2f608cb25edc59e565df3ce452574160539e5a2a777979e91"
     }
   },
-  "schemaVersion": "3.0.1",
-  "updatedAt": "2025-02-08T06:30:42.117Z",
+  "schemaVersion": "3.4.16",
+  "updatedAt": "2025-02-09T04:51:55.642Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },
