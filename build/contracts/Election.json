@@ -2802,12 +2802,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x5950Ec96CcC00F7BC389A01F66be3C60a2EaCe0a",
-      "transactionHash": "0x7aaceddf8e78268d13e45470fb318732bd72e917d8ab6e5409eb6b176048caf1"
+      "address": "0x2DF7C3b8De4cc781a0bab52c96C04175264d69C9",
+      "transactionHash": "0x18ad81a8172dcbe7812a32c86fc73786b9e031e73e7785a69c9d795b71277dea"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-02-18T06:04:12.298Z",
+  "updatedAt": "2025-02-20T08:23:11.072Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}
