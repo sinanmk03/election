@@ -90,8 +90,11 @@ App = {
               <div class="card p-3 border rounded shadow-sm text-center">
                   <h5>${name}</h5>
                   <p>Votes: <strong>${voteCount}</strong></p>
-                  ${currentPage === "voting_page.html" ? `<button class="btn btn-primary vote-btn" data-id="${id}">Vote</button>` : ""}
-                 
+                  ${
+                    currentPage === "voting_page.html"
+                      ? `<button class="btn btn-primary vote-btn" data-id="${id}">Vote</button>`
+                      : ""
+                  }
               </div>
           </div>
         `;
@@ -163,7 +166,7 @@ App = {
       ).innerText = `Connected Account: ${accounts[0]}`;
     } catch (error) {
       console.error(error);
-      alert("Error fetching results.");
+      alert(error.message);
     }
   },
 };

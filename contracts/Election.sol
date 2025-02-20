@@ -34,21 +34,21 @@ contract Election {
     // Vote for a candidate
     function vote(uint _candidateId) public {
         // Ensure the sender hasn't voted before
-        require(!voters[msg.sender], "You have already voted!");
+        require(!voters[msg.sender], "Already voted");
 
         // Ensure the candidate is valid
         require(
             _candidateId > 0 && _candidateId <= candidatesCount,
-            "Invalid candidate ID!"
+            "Invalid ID"
         );
 
         // Mark that the sender has voted
         voters[msg.sender] = true;
 
-        // Increment the candidate's vote count
-        candidates[_candidateId].voteCount++;
-
         // Trigger the voted event
         emit votedEvent(_candidateId);
+
+        // Increment the candidate's vote count
+        candidates[_candidateId].voteCount++;
     }
 }
