@@ -1,9 +1,11 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { FileQuestion } from "lucide-react";
-import "./index.css";
+
 import HomePage from "./pages/home";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
+import VotingPage from "./pages/vote";
+import ResultPage from "./pages/result";
 function App() {
   return (
     <Router>
@@ -11,6 +13,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/vote" element={<VotingPage />} />
+        <Route path="/results" element={<ResultPage />} />
         {/* <Route
           path="/admin/event-attendees/:collectionName"
           element={
@@ -19,9 +23,7 @@ function App() {
             </ProtectedRoute>
           }
         /> */}
-
         {/* 404 route */}
-
         <Route
           path="*"
           element={
