@@ -47,7 +47,7 @@ App = {
             fromBlock: "latest",
           }
         )
-        .watch(function (error, event) {
+        .watch(function (_, event) {
           console.log("Event triggered", event);
           App.render();
         });
@@ -77,6 +77,7 @@ App = {
       .then(async function (candidatesCount) {
         var candidatesContainer = $("#candidatesContainer");
         candidatesContainer.empty();
+        const currentPage = window.location.pathname.split("/").pop();
 
         for (var i = 1; i <= candidatesCount; i++) {
           let candidate = await electionInstance.candidates(i);
@@ -89,7 +90,11 @@ App = {
               <div class="card p-3 border rounded shadow-sm text-center">
                   <h5>${name}</h5>
                   <p>Votes: <strong>${voteCount}</strong></p>
-                  <button class="btn btn-primary vote-btn" data-id="${id}">Vote</button>
+                  ${
+                    currentPage === "voting_page.html"
+                      ? `<button class="btn btn-primary vote-btn" data-id="${id}">Vote</button>`
+                      : ""
+                  }
               </div>
           </div>
         `;
@@ -116,7 +121,7 @@ App = {
       .then(function (instance) {
         return instance.vote(candidateId, { from: App.account });
       })
-      .then(function (result) {
+      .then(function () {
         $("#content").hide();
         $("#loader").show();
       })
@@ -161,7 +166,7 @@ App = {
       ).innerText = `Connected Account: ${accounts[0]}`;
     } catch (error) {
       console.error(error);
-      alert("Error fetching results.");
+      alert(error.message);
     }
   },
 };

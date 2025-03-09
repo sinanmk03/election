@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page - Add Candidates</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5"></div>
+        <div class="row justify-content-center"></div>
+            <div class="col-md-6">
+                <div class="card"></div>
+                    <div class="card-header text-center">
+                        <h2>Add Candidate</h2>
+                    </div>
+                    <div class="card-body"></div>
+                        <form id="addCandidateForm"></form>
+                            <div class="form-group"></div>
+                                <label for="candidateName">Candidate Name</label>
+                                <input type="text" class="form-control" id="candidateName" name="candidateName" required>
+                            </div>
+                            <div class="form-group"></div>
+                                <label for="candidateParty">Candidate Party</label>
+                                <input type="text" class="form-control" id="candidateParty" name="candidateParty" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Add Candidate</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('addCandidateForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const candidateName = document.getElementById('candidateName').value;
+            const candidateParty = document.getElementById('candidateParty').value;
+            console.log(`Candidate Name: ${candidateName}, Candidate Party: ${candidateParty}`);
+            // Add your code here to handle the form submission, e.g., send data to the server
+            
+        });
+    </script>
+</body>
+</html>
