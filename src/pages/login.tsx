@@ -1,6 +1,10 @@
+// LoginPage.tsx
 import { useState, FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginVoter } from "../services/authService";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     voterId: "",
     password: "",
@@ -17,7 +21,7 @@ export default function LoginPage() {
     setLoading(true);
     setErrors({ voterId: "", password: "" });
 
-    // Validate form
+    // Basic validation
     let hasErrors = false;
     if (!formData.voterId) {
       setErrors((prev) => ({ ...prev, voterId: "Voter ID is required" }));
@@ -34,9 +38,14 @@ export default function LoginPage() {
     }
 
     try {
+      const result = await loginVoter(formData.voterId, formData.password);
 
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-      setMessage("Login successful!");
+      if (result.success) {
+        setMessage("Login successful! Redirecting...");
+        navigate("/vote");
+      } else {
+        setMessage(result.message);
+      }
     } catch (error) {
       setMessage("Login failed. Please try again.");
     } finally {
@@ -46,7 +55,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-blue-900 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -55,12 +63,10 @@ export default function LoginPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="min-h-[90vh] flex items-center justify-center">
           <div className="w-full max-w-md">
             <div className="bg-white shadow-xl rounded-lg px-8 pt-6 pb-8 mb-4">
-              {/* Status Message */}
               {message && (
                 <div
                   className={`mb-4 p-4 rounded-lg text-sm font-medium ${
@@ -73,16 +79,13 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {/* Login Form */}
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Loading Spinner */}
                 {loading && (
                   <div className="flex justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900"></div>
                   </div>
                 )}
 
-                {/* Voter ID Field */}
                 <div>
                   <label
                     htmlFor="voterId"
@@ -100,13 +103,11 @@ export default function LoginPage() {
                         voterId: e.target.value,
                       }))
                     }
-                    className={`mt-1 block w-full rounded-md shadow-sm
-                      ${
-                        errors.voterId
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      }
-                    `}
+                    className={`mt-1 block w-full rounded-md shadow-sm ${
+                      errors.voterId
+                        ? "border-red-300 focus:border-red-500"
+                        : "border-gray-300 focus:border-blue-500"
+                    }`}
                     placeholder="Enter Voter ID"
                   />
                   {errors.voterId && (
@@ -116,7 +117,6 @@ export default function LoginPage() {
                   )}
                 </div>
 
-                {/* Password Field */}
                 <div>
                   <label
                     htmlFor="password"
@@ -134,13 +134,11 @@ export default function LoginPage() {
                         password: e.target.value,
                       }))
                     }
-                    className={`mt-1 block w-full rounded-md shadow-sm
-                      ${
-                        errors.password
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      }
-                    `}
+                    className={`mt-1 block w-full rounded-md shadow-sm ${
+                      errors.password
+                        ? "border-red-300 focus:border-red-500"
+                        : "border-gray-300 focus:border-blue-500"
+                    }`}
                     placeholder="Enter Password"
                   />
                   {errors.password && (
@@ -150,18 +148,15 @@ export default function LoginPage() {
                   )}
                 </div>
 
-                {/* Submit Button */}
-                <div className="flex justify-center">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-1/2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
-                      bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                      disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {loading ? "Logging in..." : "Login"}
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
+                    bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500
+                    disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? "Logging in..." : "Login"}
+                </button>
               </form>
             </div>
           </div>

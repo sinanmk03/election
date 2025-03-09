@@ -1,6 +1,9 @@
 import { useState, FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { registerVoter } from "../services/authService";
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: "",
     voterId: "",
@@ -21,6 +24,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setMessage("");
     setErrors({
       fullName: "",
       voterId: "",
@@ -28,55 +32,28 @@ export default function RegisterPage() {
       confirmPassword: "",
     });
 
-    // Validate form
-    let hasErrors = false;
-    if (!formData.fullName) {
-      setErrors((prev) => ({ ...prev, fullName: "Full name is required" }));
-      hasErrors = true;
-    }
-    if (!formData.voterId) {
-      setErrors((prev) => ({ ...prev, voterId: "Voter ID is required" }));
-      hasErrors = true;
-    }
-    if (!formData.password) {
-      setErrors((prev) => ({ ...prev, password: "Password is required" }));
-      hasErrors = true;
-    } else if (formData.password.length < 8) {
-      setErrors((prev) => ({
-        ...prev,
-        password: "Password must be at least 8 characters long",
-      }));
-      hasErrors = true;
-    }
-    if (!formData.confirmPassword) {
-      setErrors((prev) => ({
-        ...prev,
-        confirmPassword: "Please confirm your password",
-      }));
-      hasErrors = true;
-    } else if (formData.password !== formData.confirmPassword) {
-      setErrors((prev) => ({
-        ...prev,
-        confirmPassword: "Passwords do not match",
-      }));
-      hasErrors = true;
-    }
-
-    if (hasErrors) {
-      setLoading(false);
-      return;
-    }
-
     try {
-      // TODO: Implement actual registration logic here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-      setMessage("Registration successful! You can now login.");
-      setFormData({
-        fullName: "",
-        voterId: "",
-        password: "",
-        confirmPassword: "",
-      });
+      const result = await registerVoter(
+        formData.voterId,
+        formData.fullName,
+        formData.password,
+        formData.confirmPassword
+      );
+
+      if (result.success) {
+        setMessage("Registration successful! Redirecting to login...");
+        navigate("/login");
+      } else {
+        if (result.errors) {
+          setErrors({
+            fullName: result.errors.fullName || "",
+            voterId: result.errors.voterId || "",
+            password: result.errors.password || "",
+            confirmPassword: result.errors.confirmPassword || "",
+          });
+        }
+        setMessage(result.message);
+      }
     } catch (error) {
       setMessage("Registration failed. Please try again.");
     } finally {
@@ -86,7 +63,6 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-blue-900 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -95,12 +71,10 @@ export default function RegisterPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="min-h-[90vh] flex items-center justify-center py-12">
           <div className="w-full max-w-md">
             <div className="bg-white shadow-xl rounded-lg px-8 pt-6 pb-8 mb-4">
-              {/* Status Message */}
               {message && (
                 <div
                   className={`mb-6 p-4 rounded-lg text-sm font-medium ${
@@ -113,16 +87,13 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              {/* Registration Form */}
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Loading Spinner */}
                 {loading && (
                   <div className="flex justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900"></div>
                   </div>
                 )}
 
-                {/* Full Name Field */}
                 <div>
                   <label
                     htmlFor="fullName"
@@ -140,14 +111,11 @@ export default function RegisterPage() {
                         fullName: e.target.value,
                       }))
                     }
-                    className={`mt-1 block w-full rounded-md shadow-sm
-                      ${
-                        errors.fullName
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      }
-                    `}
-                    placeholder="Enter full name"
+                    className={`mt-1 block w-full rounded-md shadow-sm ${
+                      errors.fullName
+                        ? "border-red-300 focus:border-red-500"
+                        : "border-gray-300 focus:border-blue-500"
+                    }`}
                   />
                   {errors.fullName && (
                     <p className="mt-1 text-sm text-red-600">
@@ -156,7 +124,6 @@ export default function RegisterPage() {
                   )}
                 </div>
 
-                {/* Voter ID Field */}
                 <div>
                   <label
                     htmlFor="voterId"
@@ -174,14 +141,11 @@ export default function RegisterPage() {
                         voterId: e.target.value,
                       }))
                     }
-                    className={`mt-1 block w-full rounded-md shadow-sm
-                      ${
-                        errors.voterId
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      }
-                    `}
-                    placeholder="Enter voter ID"
+                    className={`mt-1 block w-full rounded-md shadow-sm ${
+                      errors.voterId
+                        ? "border-red-300 focus:border-red-500"
+                        : "border-gray-300 focus:border-blue-500"
+                    }`}
                   />
                   {errors.voterId && (
                     <p className="mt-1 text-sm text-red-600">
@@ -190,7 +154,6 @@ export default function RegisterPage() {
                   )}
                 </div>
 
-                {/* Password Field */}
                 <div>
                   <label
                     htmlFor="password"
@@ -208,14 +171,11 @@ export default function RegisterPage() {
                         password: e.target.value,
                       }))
                     }
-                    className={`mt-1 block w-full rounded-md shadow-sm
-                      ${
-                        errors.password
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      }
-                    `}
-                    placeholder="Enter password"
+                    className={`mt-1 block w-full rounded-md shadow-sm ${
+                      errors.password
+                        ? "border-red-300 focus:border-red-500"
+                        : "border-gray-300 focus:border-blue-500"
+                    }`}
                   />
                   {errors.password && (
                     <p className="mt-1 text-sm text-red-600">
@@ -224,7 +184,6 @@ export default function RegisterPage() {
                   )}
                 </div>
 
-                {/* Confirm Password Field */}
                 <div>
                   <label
                     htmlFor="confirmPassword"
@@ -242,14 +201,11 @@ export default function RegisterPage() {
                         confirmPassword: e.target.value,
                       }))
                     }
-                    className={`mt-1 block w-full rounded-md shadow-sm
-                      ${
-                        errors.confirmPassword
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      }
-                    `}
-                    placeholder="Re-enter password"
+                    className={`mt-1 block w-full rounded-md shadow-sm ${
+                      errors.confirmPassword
+                        ? "border-red-300 focus:border-red-500"
+                        : "border-gray-300 focus:border-blue-500"
+                    }`}
                   />
                   {errors.confirmPassword && (
                     <p className="mt-1 text-sm text-red-600">
@@ -258,18 +214,15 @@ export default function RegisterPage() {
                   )}
                 </div>
 
-                {/* Submit Button */}
-                <div className="flex justify-center">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-1/2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
-                      bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                      disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {loading ? "Registering..." : "Register"}
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
+                    bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500
+                    disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? "Registering..." : "Register"}
+                </button>
               </form>
             </div>
           </div>
