@@ -8,56 +8,67 @@ interface RegistrationErrors {
   confirmPassword?: string;
 }
 
-interface RegistrationResult {
+export interface RegistrationResult {
   success: boolean;
   message: string;
   errors?: RegistrationErrors;
 }
 
-interface LoginResult {
+export interface LoginResult {
   success: boolean;
   message: string;
   user?: {
     id: string;
     voterId: string;
     fullName: string;
+    faceDescriptor?: number[] | null;
   };
 }
 
-// Registration function
+/**
+ * The registerVoter function now accepts an optional faceDescriptor (as a number[] or null)
+ * and stores it in Firestore along with the user’s other data.
+ */
 export const registerVoter = async (
   voterId: string,
   fullName: string,
   password: string,
-  confirmPassword: string
+  confirmPassword: string,
+  faceDescriptor?: number[] | null
 ): Promise<RegistrationResult> => {
   // Validation
   const errors: RegistrationErrors = {};
 
   if (!fullName) errors.fullName = "Full name is required";
   if (!voterId) errors.voterId = "Voter ID is required";
-  if (isNaN(Number(voterId)))
+  if (isNaN(Number(voterId))) {
     errors.voterId = "Voter ID must contain only numbers";
-  if (voterId.length !== 10) errors.voterId = "Voter ID must be 10 digits";
+  }
+  if (voterId.length !== 10) {
+    errors.voterId = "Voter ID must be 10 digits";
+  }
 
   const strongPassword =
-    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{6,}$/;
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
   if (!password) errors.password = "Password is required";
-  else if (!strongPassword.test(password))
+  else if (!strongPassword.test(password)) {
     errors.password =
       "Password must be at least 6 characters with a number, letter, and special character";
+  }
 
-  if (!confirmPassword) errors.confirmPassword = "Confirm password is required";
-  else if (password !== confirmPassword)
+  if (!confirmPassword) {
+    errors.confirmPassword = "Confirm password is required";
+  } else if (password !== confirmPassword) {
     errors.confirmPassword = "Passwords do not match";
+  }
 
-  // Return errors if any validation fails
+  // Return errors if validation fails.
   if (Object.keys(errors).length > 0) {
     return { success: false, message: "Validation failed", errors };
   }
 
   try {
-    // Check if voter exists
+    // Check if voter already exists.
     const q = query(collection(db, "voters"), where("voterId", "==", voterId));
     const querySnapshot = await getDocs(q);
 
@@ -69,12 +80,13 @@ export const registerVoter = async (
       };
     }
 
-    // Add new voter
+    // Add new voter (faceDescriptor is stored if provided)
     await addDoc(collection(db, "voters"), {
       voterId,
       fullName,
       password,
       createdAt: new Date().toISOString(),
+      faceDescriptor: faceDescriptor ? faceDescriptor : null,
     });
 
     return { success: true, message: "Registration successful!" };
@@ -87,7 +99,6 @@ export const registerVoter = async (
   }
 };
 
-// Login function
 export const loginVoter = async (
   voterId: string,
   password: string
@@ -114,6 +125,7 @@ export const loginVoter = async (
         id: userDoc.id,
         voterId: userData.voterId,
         fullName: userData.fullName,
+        faceDescriptor: userData.faceDescriptor, // Return the stored face descriptor for later use
       },
     };
   } catch (error) {

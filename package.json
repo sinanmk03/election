@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.0.12",
     "@truffle/contract": "^4.6.31",
+    "face-api.js": "^0.22.2",
     "firebase": "^11.4.0",
     "lucide-react": "^0.479.0",
     "react": "^19.0.0",
