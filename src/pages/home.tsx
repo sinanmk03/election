@@ -1,90 +1,16 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Vote as Vote2, UserPlus2, BarChart3 } from "lucide-react";
 import votin_img from "../assets/voting_image.png";
 
+import NavBar from "../components/NavBar";
 function HomePage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-
-  const navigationItems = ["Home", "Admin", "Results", "Contact"];
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="fixed w-full z-10 bg-blue-900 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <h1
-              className="text-2xl font-bold text-white"
-              onClick={() => navigate("/")}
-            >
-              Secure Vote
-            </h1>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:block">
-              <ul className="flex space-x-8">
-                {navigationItems.map((item) => {
-                  const path = item === "Home" ? "/" : `/${item.toLowerCase()}`;
-                  return (
-                    <li key={item}>
-                      <Link
-                        to={path}
-                        className="text-gray-300 hover:text-white transition-colors"
-                      >
-                        {item}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
-
-            {/* Mobile menu button */}
-            <button
-              className="md:hidden text-white"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle navigation menu"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-          </div>
-
-          {/* Mobile Navigation */}
-          {isMenuOpen && (
-            <div className="md:hidden">
-              <ul className="pb-4">
-                {navigationItems.map((item) => {
-                  const path = item === "Home" ? "/" : `/${item.toLowerCase()}`;
-                  return (
-                    <li key={item}>
-                      <Link
-                        to={path}
-                        className="block px-4 py-2 text-gray-300 hover:text-white hover:bg-blue-800 rounded-lg"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {item}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
-        </div>
+        <NavBar />
       </header>
 
       {/* Main Content */}
