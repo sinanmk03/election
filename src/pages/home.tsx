@@ -6,7 +6,7 @@ function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const navigationItems = ["Home", "Admin", "Vote", "Result", "Contact"];
+  const navigationItems = ["Home", "Admin", "Vote", "Results", "Contact"];
 
   return (
     <div className="min-h-screen bg-gray-50">

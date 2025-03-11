@@ -6,6 +6,7 @@ import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import VotingPage from "./pages/vote";
 import ResultPage from "./pages/result";
+import AdminPage from "./pages/admin";
 function App() {
   return (
     <Router>
@@ -15,6 +16,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/vote" element={<VotingPage />} />
         <Route path="/results" element={<ResultPage />} />
+        <Route path="/admin" element={<AdminPage />} />
         {/* <Route
           path="/admin/event-attendees/:collectionName"
           element={
