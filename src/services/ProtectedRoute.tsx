@@ -8,18 +8,17 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
+  const { user, initialized } = useAuth();
 
-  if (loading) {
-    // Optionally, show a loading spinner or some placeholder
+  // Wait until we've finished reading localStorage
+  if (!initialized) {
     return <Loading />;
   }
 
+  // If no user is present, redirect to /login
   if (!user) {
-    // If no user, redirect to login
     return <Navigate to="/login" />;
   }
 
-  // Otherwise, render children
   return <>{children}</>;
 }
