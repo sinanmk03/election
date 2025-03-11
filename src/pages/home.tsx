@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Vote as Vote2, UserPlus2, BarChart3 } from "lucide-react";
+import votin_img from "../assets/voting_image.png";
 
 function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const navigationItems = ["Home", "Admin", "Vote", "Results", "Contact"];
+  const navigationItems = ["Home", "Admin", "Results", "Contact"];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -14,7 +15,12 @@ function HomePage() {
       <header className="fixed w-full z-10 bg-blue-900 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-white"   onClick={() => navigate("/")}>Secure Vote</h1>
+            <h1
+              className="text-2xl font-bold text-white"
+              onClick={() => navigate("/")}
+            >
+              Secure Vote
+            </h1>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:block">
@@ -86,7 +92,7 @@ function HomePage() {
         {/* Hero Section */}
         <div className="flex flex-col md:flex-row items-center justify-between py-12">
           <div className="md:w-1/2 mb-8 md:mb-0">
-            <blockquote className="text-2xl font-light text-gray-700 italic">
+            <blockquote className="text-2xl font-medium text-gray-700 italic">
               "Voting is the expression of our commitment to ourselves, one
               another, this country and this world."
               <footer className="mt-2 text-gray-600">- Sharon Salzberg</footer>
@@ -94,7 +100,7 @@ function HomePage() {
           </div>
           <div className="md:w-1/2 flex justify-center">
             <img
-              src="https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&q=80&w=600"
+              src={votin_img}
               alt="Voting illustration"
               className="rounded-lg shadow-xl max-w-md w-full"
             />
