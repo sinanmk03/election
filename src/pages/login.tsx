@@ -1,9 +1,9 @@
-// LoginPage.tsx
 import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginVoter } from "../services/authService";
+import { useAuth } from "../services/AuthContext";
 
 export default function LoginPage() {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     voterId: "",
@@ -20,6 +20,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setErrors({ voterId: "", password: "" });
+    setMessage("");
 
     // Basic validation
     let hasErrors = false;
@@ -38,13 +39,12 @@ export default function LoginPage() {
     }
 
     try {
-      const result = await loginVoter(formData.voterId, formData.password);
-
-      if (result.success) {
+      const success = await login(formData.voterId, formData.password);
+      if (success) {
         setMessage("Login successful! Redirecting...");
         navigate("/vote");
       } else {
-        setMessage(result.message);
+        setMessage("Login failed. Please check your credentials.");
       }
     } catch (error) {
       setMessage("Login failed. Please try again.");
