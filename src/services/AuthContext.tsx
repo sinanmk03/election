@@ -6,17 +6,17 @@ import {
   ReactNode,
 } from "react";
 import { loginVoter } from "./authService";
-// If you want to call registerVoter, you can import that here as well.
 
 interface User {
   id: string;
   voterId: string;
   fullName: string;
+  faceDescriptor?: number[] | null;
 }
 
 interface AuthContextType {
   user: User | null;
-  loading: boolean;
+  initialized: boolean;
   login: (voterId: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
@@ -25,61 +25,54 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Use "initialized" flag to indicate that the AuthContext has rehydrated from localStorage.
+  const [initialized, setInitialized] = useState(false);
 
-  // On mount, check if user data is in localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        console.log("User loaded from localStorage:", parsedUser);
+      } catch (e) {
+        console.error("Error parsing stored user:", e);
+      }
+    } else {
+      console.log("No user found in localStorage");
     }
-    setLoading(false);
+    setInitialized(true);
   }, []);
 
-  /**
-   * login function calls your Firestore-based login logic (loginVoter).
-   * If successful, store the user in localStorage and in state.
-   */
   const login = async (voterId: string, password: string): Promise<boolean> => {
     try {
-      setLoading(true);
       const result = await loginVoter(voterId, password);
       if (result.success && result.user) {
         setUser(result.user);
         localStorage.setItem("user", JSON.stringify(result.user));
+        console.log("User logged in:", result.user);
         return true;
-      } else {
-        return false;
       }
+      return false;
     } catch (error) {
       console.error("Login error:", error);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
-  /**
-   * logout function clears localStorage and resets state.
-   */
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    console.log("User logged out");
   };
 
-  const value: AuthContextType = {
-    user,
-    loading,
-    login,
-    logout,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, initialized, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-/**
- * Convenience hook for consuming the AuthContext.
- */
 export function useAuth() {
   return useContext(AuthContext);
 }
