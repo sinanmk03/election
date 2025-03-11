@@ -8,7 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-build
+src\contracts
 package-lock.json
 dist
 dist-ssr

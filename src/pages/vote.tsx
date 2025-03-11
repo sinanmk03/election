@@ -1,4 +1,4 @@
-// VotingPage.tsx
+// src/pages/VotingPage.tsx
 import { useEffect } from "react";
 import { useWeb3 } from "../services/Web3Context";
 import { Vote } from "lucide-react";

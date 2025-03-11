@@ -1,46 +1,20 @@
-import { useState, useEffect } from "react";
+// src/pages/ResultPage.tsx
+import { useEffect } from "react";
+import { useWeb3 } from "../services/Web3Context";
 import { Vote } from "lucide-react";
 
-interface Candidate {
-  id: number;
-  name: string;
-  imageUrl: string;
-  voteCount: number;
-}
-
 export default function ResultPage() {
-  const [loading, setLoading] = useState(true);
-  const [candidates, setCandidates] = useState<Candidate[]>([
-    {
-      id: 1,
-      name: "Candidate 1",
-      imageUrl:
-        "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=200&h=200",
-      voteCount: 1500,
-    },
-    {
-      id: 2,
-      name: "Candidate 2",
-      imageUrl:
-        "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=200&h=200",
-      voteCount: 1200,
-    },
-  ]);
-  const [accountAddress, setAccountAddress] = useState<string>("");
+  const { loading, candidates, account, fetchCandidates } = useWeb3();
 
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setAccountAddress("0x123...abc"); // Example address
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
+    fetchCandidates();
+    // Optionally refresh candidate data every 10 seconds for real-time updates.
+    const interval = setInterval(fetchCandidates, 10000);
+    return () => clearInterval(interval);
+  }, [fetchCandidates]);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-[#0a3981] text-white p-6 shadow-lg">
         <div className="container mx-auto flex items-center gap-2">
           <Vote className="h-8 w-8" />
@@ -48,7 +22,6 @@ export default function ResultPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-2">
           Live Election Results
@@ -90,7 +63,7 @@ export default function ResultPage() {
 
             <div className="mt-8 text-center">
               <p className="text-gray-600 font-mono">
-                Connected Account: {accountAddress}
+                Connected Account: {account || "Not connected"}
               </p>
               <p className="text-sm text-gray-500 mt-2">
                 Results updated in real-time from blockchain

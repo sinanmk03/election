@@ -1,13 +1,18 @@
+// src/pages/AdminPage.tsx
+
 import { useState } from "react";
 import { useWeb3 } from "../services/Web3Context";
-import { PlusCircle, Vote } from "lucide-react";
+import { PlusCircle, Vote, Upload } from "lucide-react";
+import { db } from "../services/firebaseConfig"; // optional
+import { collection, addDoc } from "firebase/firestore"; // optional
+import { uploadToCloudinary } from "../services/cloudinary";
 
 export default function AdminPage() {
-  const { contract, account, loading, fetchCandidates } = useWeb3();
-  const [newCandidate, setNewCandidate] = useState({
-    name: "",
-    imageUrl: "",
-  });
+  const { addCandidate, account, loading, fetchCandidates } = useWeb3();
+
+  const [candidateName, setCandidateName] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -16,17 +21,32 @@ export default function AdminPage() {
     setError("");
     setSuccessMessage("");
 
-    if (!newCandidate.name.trim()) {
-      setError("Candidate name is required");
+    if (!candidateName.trim()) {
+      setError("Candidate name is required.");
       return;
     }
 
     try {
-      await contract.methods
-        .addCandidate(newCandidate.name)
-        .send({ from: account });
+      let finalImageUrl = "";
+      if (selectedFile) {
+        // This now automatically places the file in the "assets/" folder
+        finalImageUrl = await uploadToCloudinary(selectedFile);
+      }
+
+      // Call your contract method to add the candidate on-chain
+      await addCandidate(candidateName, finalImageUrl);
+
+      // Optionally store an off-chain record in Firestore
+      await addDoc(collection(db, "candidates"), {
+        name: candidateName,
+        imageUrl: finalImageUrl,
+        createdAt: new Date().toISOString(),
+        adminAddress: account,
+      });
+
       setSuccessMessage("Candidate added successfully!");
-      setNewCandidate({ name: "", imageUrl: "" });
+      setCandidateName("");
+      setSelectedFile(null);
       await fetchCandidates();
     } catch (err) {
       console.error("Error adding candidate:", err);
@@ -35,72 +55,96 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-[#0a3981] text-white p-6 shadow-lg">
-        <div className="container mx-auto flex items-center gap-2">
-          <Vote className="h-8 w-8" />
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-[#0a3981] to-[#1e4b94] text-white py-6 px-4 shadow-lg">
+        <div className="container mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Vote className="h-8 w-8 md:h-10 md:w-10" />
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+              Admin Dashboard
+            </h1>
+          </div>
+          <div className="text-sm md:text-base opacity-75">
+            {account
+              ? `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`
+              : "Not Connected"}
+          </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
-            Add New Candidate
-          </h2>
+      <main className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-[#0a3981]/5 p-6 border-b border-gray-100">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+              Add New Candidate
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Fill in the details below to add a new candidate to the voting
+              system.
+            </p>
+          </div>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-              {error}
-            </div>
-          )}
+          <div className="p-6">
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl flex items-center gap-2">
+                <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-red-600" />
+                {error}
+              </div>
+            )}
 
-          {successMessage && (
-            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">
-              {successMessage}
-            </div>
-          )}
+            {successMessage && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-100 text-green-700 rounded-xl flex items-center gap-2">
+                <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-green-600" />
+                {successMessage}
+              </div>
+            )}
 
-          <form onSubmit={handleAddCandidate} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Candidate Name
-              </label>
-              <input
-                type="text"
-                value={newCandidate.name}
-                onChange={(e) =>
-                  setNewCandidate({ ...newCandidate, name: e.target.value })
-                }
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#0a3981] focus:border-[#0a3981]"
-                placeholder="Enter candidate name"
-              />
-            </div>
+            <form onSubmit={handleAddCandidate} className="space-y-6">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Candidate Name
+                </label>
+                <input
+                  type="text"
+                  value={candidateName}
+                  onChange={(e) => setCandidateName(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0a3981]/20 focus:border-[#0a3981] transition-colors duration-200"
+                  placeholder="Enter candidate name"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Image URL (Optional)
-              </label>
-              <input
-                type="url"
-                value={newCandidate.imageUrl}
-                onChange={(e) =>
-                  setNewCandidate({ ...newCandidate, imageUrl: e.target.value })
-                }
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#0a3981] focus:border-[#0a3981]"
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Candidate Image
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setSelectedFile(e.target.files[0]);
+                      }
+                    }}
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0a3981]/20 focus:border-[#0a3981] transition-colors duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#0a3981]/10 file:text-[#0a3981] hover:file:bg-[#0a3981]/20"
+                  />
+                  <Upload className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#0a3981] text-white py-2 px-4 rounded-lg hover:bg-[#0a3981]/90 transition-colors duration-200 flex items-center justify-center gap-2"
-            >
-              <PlusCircle className="h-5 w-5" />
-              {loading ? "Adding Candidate..." : "Add Candidate"}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[#0a3981] text-white py-3 px-6 rounded-xl hover:bg-[#0a3981]/90 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-[#0a3981]/10 hover:shadow-xl hover:shadow-[#0a3981]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <PlusCircle className="h-5 w-5" />
+                <span className="font-medium">
+                  {loading ? "Adding Candidate..." : "Add Candidate"}
+                </span>
+              </button>
+            </form>
+          </div>
         </div>
       </main>
     </div>

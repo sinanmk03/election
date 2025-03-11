@@ -1,118 +1,133 @@
-// Web3Context.tsx
-import { createContext, useContext, useEffect, useState } from "react";
+// src/services/Web3Context.tsx
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import Web3 from "web3";
-import ElectionContract from "../../build/contracts/Election.json";
+import { Contract } from "web3-eth-contract";
+import { AbiItem } from "web3-utils";
+import VotingContractABI from "../contracts/VotingContract.json";
 
-interface Web3ContextType {
-  web3: Web3 | null;
-  contract: any;
-  account: string;
-  loading: boolean;
-  candidates: Candidate[];
-  hasVoted: boolean;
-  fetchCandidates: () => Promise<void>;
-  castVote: (candidateId: number) => Promise<void>;
-}
+/** Replace with your deployed address */
+const CONTRACT_ADDRESS = "0xfA79E22A1109bb0D2B248DBE746C92CF96C810A0";
 
 interface Candidate {
   id: number;
   name: string;
-  voteCount: number;
   imageUrl: string;
+  voteCount: number;
 }
 
-const Web3Context = createContext<Web3ContextType>({} as Web3ContextType);
+interface Web3ContextType {
+  web3: Web3 | null;
+  account: string;
+  candidates: Candidate[];
+  loading: boolean;
+  hasVoted: boolean;
+  fetchCandidates: () => Promise<void>;
+  castVote: (candidateId: number) => Promise<void>;
+  addCandidate: (name: string, imageUrl: string) => Promise<void>;
+  contract: Contract<AbiItem[]> | null;
+}
 
-export const Web3Provider = ({ children }: { children: React.ReactNode }) => {
+const Web3Context = createContext<Web3ContextType | undefined>(undefined);
+
+export const useWeb3 = (): Web3ContextType => {
+  const context = useContext(Web3Context);
+  if (!context) {
+    throw new Error("useWeb3 must be used within a Web3Provider");
+  }
+  return context;
+};
+
+export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [web3, setWeb3] = useState<Web3 | null>(null);
-  const [contract, setContract] = useState<any>(null);
   const [account, setAccount] = useState<string>("");
-  const [loading, setLoading] = useState(true);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [loading, setLoading] = useState(true);
   const [hasVoted, setHasVoted] = useState(false);
+  const [contract, setContract] = useState<Contract<AbiItem[]> | null>(null);
 
   useEffect(() => {
-    const initWeb3 = async () => {
+    async function init() {
       try {
-        let web3Instance: Web3;
-
-        if (window.ethereum) {
-          web3Instance = new Web3(window.ethereum);
-          await window.ethereum.request({ method: "eth_requestAccounts" });
-        } else if (window.web3) {
-          web3Instance = new Web3(window.web3.currentProvider);
-        } else {
-          web3Instance = new Web3(
-            new Web3.providers.HttpProvider("http://localhost:7545")
-          );
+        const ethereum = (window as any).ethereum;
+        if (!ethereum) {
+          console.error("MetaMask not detected. Please install or enable it.");
+          setLoading(false);
+          return;
         }
 
-        const networkId = await web3Instance.eth.net.getId();
-        const deployedNetwork = (ElectionContract as any).networks[
-          Number(networkId)
-        ];
-        const contractInstance = new web3Instance.eth.Contract(
-          ElectionContract.abi,
-          deployedNetwork && deployedNetwork.address
-        );
+        const _web3 = new Web3(ethereum);
+        await ethereum.request({ method: "eth_requestAccounts" });
+        setWeb3(_web3);
 
-        const accounts = await web3Instance.eth.getAccounts();
-        const votedStatus = await contractInstance.methods
-          .voters(accounts[0])
-          .call();
-
-        setWeb3(web3Instance);
-        setContract(contractInstance);
+        const accounts = await _web3.eth.getAccounts();
+        if (!accounts || accounts.length === 0) {
+          console.error("No MetaMask accounts found. Is MetaMask locked?");
+          setLoading(false);
+          return;
+        }
         setAccount(accounts[0]);
-        setHasVoted(votedStatus ? true : false);
-        await fetchCandidates(contractInstance);
-      } catch (error) {
-        console.error("Web3 initialization error:", error);
+
+        const typedAbi = VotingContractABI.abi as AbiItem[];
+        const _contract = new _web3.eth.Contract(typedAbi, CONTRACT_ADDRESS);
+        setContract(_contract);
+
+        const voted = await _contract.methods.hasVoted(accounts[0]).call();
+        setHasVoted(!!voted);
+      } catch (err) {
+        console.error("Error during Web3 initialization:", err);
       } finally {
         setLoading(false);
       }
-    };
-
-    initWeb3();
+    }
+    init();
   }, []);
 
-  const fetchCandidates = async (contractInstance?: any) => {
-    const usedContract = contractInstance || contract;
-    if (!usedContract) return;
-
+  const fetchCandidates = useCallback(async () => {
+    if (!contract) return;
     try {
-      const count = await usedContract.methods.candidatesCount().call();
-      const candidatesArray: Candidate[] = [];
-
-      for (let i = 1; i <= count; i++) {
-        const candidate = await usedContract.methods.candidates(i).call();
-        candidatesArray.push({
-          id: Number(candidate.id),
-          name: candidate.name,
-          voteCount: Number(candidate.voteCount),
-          imageUrl: `https://picsum.photos/200?random=${i}`,
-        });
-      }
-
+      const candidateData = await contract.methods.getCandidates().call();
+      const candidatesArray = (candidateData || []).map((c: any) => ({
+        id: c.id,
+        name: c.name,
+        imageUrl: c.imageUrl,
+        voteCount: parseInt(c.voteCount, 10),
+      }));
       setCandidates(candidatesArray);
     } catch (error) {
       console.error("Error fetching candidates:", error);
     }
-  };
+  }, [contract]);
 
   const castVote = async (candidateId: number) => {
     if (!contract || !account) return;
-
     try {
-      setLoading(true);
       await contract.methods.vote(candidateId).send({ from: account });
       setHasVoted(true);
       await fetchCandidates();
     } catch (error) {
-      console.error("Voting error:", error);
+      console.error("Error casting vote:", error);
       throw error;
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const addCandidate = async (name: string, imageUrl: string) => {
+    if (!contract || !account) return;
+    try {
+      await contract.methods
+        .addCandidate(name, imageUrl)
+        .send({ from: account });
+      await fetchCandidates();
+    } catch (error) {
+      console.error("Error adding candidate:", error);
+      throw error;
     }
   };
 
@@ -120,18 +135,17 @@ export const Web3Provider = ({ children }: { children: React.ReactNode }) => {
     <Web3Context.Provider
       value={{
         web3,
-        contract,
         account,
-        loading,
         candidates,
+        loading,
         hasVoted,
         fetchCandidates,
         castVote,
+        addCandidate,
+        contract,
       }}
     >
       {children}
     </Web3Context.Provider>
   );
 };
-
-export const useWeb3 = () => useContext(Web3Context);
