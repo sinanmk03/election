@@ -5,8 +5,8 @@
  * Places the file in the "assets" folder by default.
  */
 export async function uploadToCloudinary(file: File): Promise<string> {
-  const CLOUD_NAME = "YOUR_CLOUD_NAME";
-  const UPLOAD_PRESET = "YOUR_UPLOAD_PRESET";
+  const CLOUD_NAME = "dxsttrcsq";
+  const UPLOAD_PRESET = "secure_vote";
 
   const formData = new FormData();
   formData.append("file", file);

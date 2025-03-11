@@ -12,7 +12,7 @@ import { AbiItem } from "web3-utils";
 import VotingContractABI from "../contracts/VotingContract.json";
 
 /** Replace with your deployed address */
-const CONTRACT_ADDRESS = "0x500b2bc740411265e9be27473bEF810bb09ad7d9";
+const CONTRACT_ADDRESS = "0xfA79E22A1109bb0D2B248DBE746C92CF96C810A0";
 
 interface Candidate {
   id: number;
