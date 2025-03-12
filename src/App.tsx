@@ -6,7 +6,7 @@ import RegisterPage from "./pages/register";
 import VotingPage from "./pages/vote";
 import ResultPage from "./pages/result";
 import AdminPage from "./pages/admin";
-import ProtectedRoute from "./services/ProtectedRoute";
+// import ProtectedRoute from "./services/ProtectedRoute";
 
 function App() {
   return (
@@ -17,14 +17,15 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/results" element={<ResultPage />} />
         <Route path="/admin" element={<AdminPage />} />
-        <Route
+        <Route path="/vote" element={<VotingPage />} />
+        {/* <Route
           path="/vote"
           element={
             <ProtectedRoute>
               <VotingPage />
             </ProtectedRoute>
           }
-        />
+        /> */}
         {/* 404 route */}
         <Route
           path="*"
