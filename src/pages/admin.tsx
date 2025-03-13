@@ -8,8 +8,8 @@ import { collection, addDoc } from "firebase/firestore"; // optional
 import { uploadToCloudinary } from "../services/cloudinary";
 
 export default function AdminPage() {
-  const { addCandidate, account, loading, fetchCandidates } = useWeb3();
-
+  const { addCandidate, account, fetchCandidates } = useWeb3();
+  const [isLoading, setIsLoading] = useState(false);
   const [candidateName, setCandidateName] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -20,9 +20,11 @@ export default function AdminPage() {
     e.preventDefault();
     setError("");
     setSuccessMessage("");
+    setIsLoading(true);
 
     if (!candidateName.trim()) {
       setError("Candidate name is required.");
+      setIsLoading(false);
       return;
     }
 
@@ -47,10 +49,13 @@ export default function AdminPage() {
       setSuccessMessage("Candidate added successfully!");
       setCandidateName("");
       setSelectedFile(null);
+
       await fetchCandidates();
     } catch (err) {
       console.error("Error adding candidate:", err);
       setError("Failed to add candidate. Make sure you're the admin.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,7 +77,6 @@ export default function AdminPage() {
           </div>
         </div>
       </header>
-
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="bg-[#0a3981]/5 p-6 border-b border-gray-100">
@@ -92,14 +96,12 @@ export default function AdminPage() {
                 {error}
               </div>
             )}
-
             {successMessage && (
               <div className="mb-6 p-4 bg-green-50 border border-green-100 text-green-700 rounded-xl flex items-center gap-2">
                 <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-green-600" />
                 {successMessage}
               </div>
-            )}
-
+            )}{" "}
             <form onSubmit={handleAddCandidate} className="space-y-6">
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
@@ -135,18 +137,23 @@ export default function AdminPage() {
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={isLoading}
                 className="w-full bg-[#0a3981] text-white py-3 px-6 rounded-xl hover:bg-[#0a3981]/90 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-[#0a3981]/10 hover:shadow-xl hover:shadow-[#0a3981]/20 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <PlusCircle className="h-5 w-5" />
                 <span className="font-medium">
-                  {loading ? "Adding Candidate..." : "Add Candidate"}
+                  {isLoading ? "Adding Candidate..." : "Add Candidate"}
                 </span>
               </button>
             </form>
           </div>
         </div>
-      </main>
+      </main>{" "}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/25 flex items-center justify-center">
+          <div className="spinner"></div>
+        </div>
+      )}
     </div>
   );
 }
